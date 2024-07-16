@@ -4,17 +4,18 @@ import { deleteUser } from "../services/userService";
 import Swal from "sweetalert2";
 
 const DeleteUser = () => {
-  const [email, setEmail] = useState("");
+  const [id, setId] = useState("");
 
   const deleteSubmit = async (e) => {
     e.preventDefault();
     try {
-      await deleteUser(email);
+      await deleteUser(id);
       Swal.fire({
         icon: "success",
         title: "Éxito",
         text: "Usuario eliminado exitosamente",
       });
+      setId("");
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -32,12 +33,12 @@ const DeleteUser = () => {
       </Typography>
       <form onSubmit={deleteSubmit}>
         <TextField
-          label="Email"
-          type="email"
+          label="ID"
+          type="text"
           fullWidth
           margin="normal"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={id}
+          onChange={(e) => setId(e.target.value)}
           required
         />
         <Button type="submit" variant="contained" color="primary" fullWidth>

@@ -9,11 +9,11 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { getUserByEmail, updateUser } from "../services/userService";
+import { getUserById, updateUser } from "../services/userService";
 import Swal from "sweetalert2";
 
 const UpdateUser = () => {
-
+  const [id, setId] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
@@ -21,17 +21,20 @@ const UpdateUser = () => {
 
   const searchUser = async (e) => {
     e.preventDefault();
-    if (!email) {
+    if (!id) {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "llenar campo obligatorio",
+        text: "Llenar campo obligatorio",
       });
       return;
     }
     try {
-      const user = await getUserByEmail(email);
+      const user = await getUserById(id);
       if (user) {
+        setEmail(user.data.email);
+        setPassword(user.data.password);
+        setRole(user.data.role);
         setUserFound(true);
         Swal.fire({
           icon: "success",
@@ -42,7 +45,7 @@ const UpdateUser = () => {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "usuario no encontrado",
+          text: "Usuario no encontrado",
         });
       }
     } catch (error) {
@@ -58,7 +61,7 @@ const UpdateUser = () => {
   const updateSubmit = async (e) => {
     e.preventDefault();
     try {
-      await updateUser(email, password, role);
+      await updateUser(id, email, password, role);
       Swal.fire({
         icon: "success",
         title: "Éxito",
@@ -81,20 +84,29 @@ const UpdateUser = () => {
       </Typography>
       <form onSubmit={searchUser}>
         <TextField
-          label="Email"
-          type="email"
+          label="ID"
+          type="text"
           fullWidth
           margin="normal"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={id}
+          onChange={(e) => setId(e.target.value)}
           required
         />
         <Button type="submit" variant="contained" color="primary" fullWidth>
-          buscar
+          Buscar
         </Button>
       </form>
       {userFound && (
         <form onSubmit={updateSubmit}>
+          <TextField
+            label="Email"
+            type="email"
+            fullWidth
+            margin="normal"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
           <TextField
             label="Password"
             type="password"
