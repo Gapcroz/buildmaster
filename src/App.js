@@ -10,6 +10,7 @@ import AppBarComponent from './components/AppBar';
 import Sidebar from './components/Sidebar';
 import ContractorScreen from './components/ContractorScreen';
 import AssignContractor from './components/AssignContractor';
+import AuditProgress from './pages/AuditProgress';
 import { Box, CssBaseline } from '@mui/material';
 
 const App = () => {
@@ -36,6 +37,7 @@ const App = () => {
                                 <Route path="/upload" element={<UploadExcel />} />
                                 <Route path="/contractor" element={<ContractorScreen />} />
                                 <Route path="/assign-contractor" element={<AssignContractor />} />
+                                <Route path="/audit-progress" element={<AuditProgress />} />
                             </>
                         ) : (
                             <Route path="*" element={<Navigate to="/login" />} />
