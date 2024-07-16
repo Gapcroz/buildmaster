@@ -13,6 +13,7 @@ import { getUserByEmail, updateUser } from "../services/userService";
 import Swal from "sweetalert2";
 
 const UpdateUser = () => {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
