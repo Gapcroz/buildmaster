@@ -1,20 +1,26 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Login from './components/Login';
-import Register from './components/Register';
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import Users from './pages/Users';
-import UploadExcel from './components/UploadExcel';
-import AppBarComponent from './components/AppBar';
-import Sidebar from './components/Sidebar';
-import ContractorScreen from './components/ContractorScreen';
-import AssignContractor from './components/AssignContractor';
-import AuditProgress from './pages/AuditProgress';
-import { Box, CssBaseline } from '@mui/material';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+import Users from "./pages/Users";
+import UploadExcel from "./components/UploadExcel";
+import AppBarComponent from "./components/AppBar";
+import Sidebar from "./components/Sidebar";
+import ContractorScreen from "./components/ContractorScreen";
+import AssignContractor from "./components/AssignContractor";
+import { Box, CssBaseline } from "@mui/material";
+
 
 const App = () => {
-    const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
+
 
     return (
         <Router>
