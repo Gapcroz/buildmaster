@@ -20,17 +20,17 @@ const ProjectProgressChart = ({ projects }) => {
   };
 
   const chartData = {
-    labels: selectedProject?.weeks.map((week, index) => week.week || `Week ${index + 1}`) || [],
+    labels: selectedProject?.weeklyProgress.map(week => `Week ${week.week}`) || [],
     datasets: [
       {
         label: 'Planned Progress',
-        data: selectedProject?.weeks.map(week => week.plannedProgress || 0) || [],
+        data: selectedProject?.weeklyProgress.map(week => week.plannedProgress || 0) || [],
         borderColor: 'rgb(75, 192, 192)',
         tension: 0.1,
       },
       {
         label: 'Real Progress',
-        data: selectedProject?.weeks.map(week => week.realProgress || 0) || [],
+        data: selectedProject?.weeklyProgress.map(week => week.realProgress || 0) || [],
         borderColor: 'rgb(255, 99, 132)',
         tension: 0.1,
       },
@@ -81,9 +81,9 @@ const ProjectProgressChart = ({ projects }) => {
       {selectedProject ? (
         <>
           <Line data={chartData} options={options} />
-          {selectedProject.weeks.map((week, index) => (
-            <Typography key={week._id || index} variant="body2" sx={{ marginTop: 1 }}>
-              {week.week || `Week ${index + 1}`}: {week.delayReason ? `Delay reason: ${week.delayReason}` : 'No delays reported'}
+          {selectedProject.weeklyProgress.map((week) => (
+            <Typography key={week._id} variant="body2" sx={{ marginTop: 1 }}>
+              Week {week.week}: {week.delayReason ? `Delay reason: ${week.delayReason}` : 'No delays reported'}
             </Typography>
           ))}
         </>

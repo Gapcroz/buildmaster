@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
   Container,
@@ -11,56 +11,87 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Alert,
+  Snackbar
 } from '@mui/material';
 
 const UploadExcel = () => {
   const [file, setFile] = useState(null);
-  const [data, setData] = useState([]);
-  const [projectName, setProjectName] = useState('');
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState('');
+  const [uploadedData, setUploadedData] = useState(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const baseUrl = "http://localhost:3001/api";
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get(`${baseUrl}/projects/projects`);
+      setProjects(response.data);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      showSnackbar('Error fetching projects', 'error');
+    }
+  };
 
   const handleFileUpload = async () => {
-
-    if (!file || !projectName ) {
-      alert('Todos los campos son obligatorios');
+    if (!file || !selectedProject) {
+      showSnackbar('Please select a file and a project', 'error');
       return;
     }
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('projectName', projectName);
+    formData.append('projectId', selectedProject);
 
     try {
-      const response = await axios.post('http://localhost:3001/upload', formData, {
+      const response = await axios.post('http://localhost:3001/api/upload/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
 
       if (response.status === 200) {
-        setData(response.data.data);
+        setUploadedData(response.data.project);
+        showSnackbar('File uploaded successfully', 'success');
       } else {
-        alert('Error uploading file');
+        showSnackbar('Error uploading file', 'error');
       }
     } catch (error) {
       console.error('Error uploading file', error);
-      alert('Error uploading file');
+      showSnackbar(error.response?.data?.error || 'Error uploading file', 'error');
     }
+  };
+
+  const showSnackbar = (message, severity) => {
+    setSnackbar({ open: true, message, severity });
   };
 
   return (
     <Container maxWidth="md">
       <Typography variant="h4" component="h1" gutterBottom>
-        Subir archivo de progreso
+        Upload Progress File
       </Typography>
-      <TextField
-        label="Nombre del Proyecto"
-        fullWidth
-        margin="normal"
-        value={projectName}
-        onChange={(e) => setProjectName(e.target.value)}
-        required
-      />
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="project-select-label">Select Project</InputLabel>
+        <Select
+          labelId="project-select-label"
+          value={selectedProject}
+          onChange={(e) => setSelectedProject(e.target.value)}
+          required
+        >
+          {projects.map((project) => (
+            <MenuItem key={project._id} value={project._id}>{project.name}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
       <TextField
         type="file"
         onChange={(e) => setFile(e.target.files[0])}
@@ -75,54 +106,48 @@ const UploadExcel = () => {
         fullWidth
         style={{ marginTop: '1rem' }}
       >
-        Subir
+        Upload
       </Button>
 
-      {data.length > 0 && (
+      {uploadedData && (
         <>
           <Typography variant="h6" component="h2" gutterBottom style={{ marginTop: '2rem' }}>
-            Datos importados:
+            Uploaded Data:
           </Typography>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Etapa</TableCell>
-                  <TableCell>% Avance</TableCell>
-                  <TableCell>Condominio</TableCell>
-                  <TableCell>Manzana</TableCell>
-                  <TableCell>Lote</TableCell>
-                  <TableCell>Int.</TableCell>
-                  <TableCell>Tipo</TableCell>
-                  <TableCell>Semana</TableCell>
-                  <TableCell>Fecha</TableCell>
-                  <TableCell>Progreso</TableCell>
-                  <TableCell>Causa Retraso</TableCell>
+                  <TableCell>Week</TableCell>
+                  <TableCell>Start Date</TableCell>
+                  <TableCell>End Date</TableCell>
+                  <TableCell>Planned Progress</TableCell>
+                  <TableCell>Real Progress</TableCell>
+                  <TableCell>Delay Reason</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data.map((avance, index) =>
-                  avance.semanas.map((semana, subIndex) => (
-                    <TableRow key={`${index}-${subIndex}`}>
-                      <TableCell>{avance.etapa}</TableCell>
-                      <TableCell>{avance.tipoAvance}</TableCell>
-                      <TableCell>{avance.condominio}</TableCell>
-                      <TableCell>{avance.mza}</TableCell>
-                      <TableCell>{avance.lote}</TableCell>
-                      <TableCell>{avance.int}</TableCell>
-                      <TableCell>{avance.tipo}</TableCell>
-                      <TableCell>{semana.semana}</TableCell>
-                      <TableCell>{semana.fecha}</TableCell>
-                      <TableCell>{semana.progreso}</TableCell>
-                      <TableCell>{semana.causaRetraso}</TableCell>
-                    </TableRow>
-                  ))
-                )}
+                {uploadedData.weeklyProgress.map((week, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{week.week}</TableCell>
+                    <TableCell>{week.startDate || 'N/A'}</TableCell>
+                    <TableCell>{week.endDate || 'N/A'}</TableCell>
+                    <TableCell>{week.plannedProgress !== null ? `${week.plannedProgress}%` : 'N/A'}</TableCell>
+                    <TableCell>{week.realProgress !== null ? `${week.realProgress}%` : 'N/A'}</TableCell>
+                    <TableCell>{week.delayReason || 'N/A'}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
         </>
       )}
+
+      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
