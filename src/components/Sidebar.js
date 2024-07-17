@@ -15,6 +15,7 @@ const Sidebar = () => {
         { text: 'Subir Excel', icon: <UploadFile />, path: '/upload' },
         { text: 'Contratista', icon: <UploadFile />, path: '/contractor'},
         { text: 'Asignar Contratista', icon: <UploadFile />, path: '/assign-contractor'},
+        { text: 'Progreso Auditor', icon: < Dashboard/>, path: '/audit-progress' },
     ];
 
     return (

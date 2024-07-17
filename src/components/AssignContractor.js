@@ -54,7 +54,7 @@ const AssignContractor = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await assignContractor(selectedProject, selectedContractor);
+            await assignContractor(selectedProject._id, selectedContractor);
             Swal.fire({
                 icon: 'success',
                 title: 'Éxito',
@@ -85,9 +85,9 @@ const AssignContractor = () => {
                         value={selectedProject || ''}
                         onChange={handleProjectChange}
                     >
-                        {projects.map((project, index) => (
-                            <MenuItem key={index} value={project}>
-                                {project}
+                        {projects.map((project) => (
+                            <MenuItem key={project._id} value={project}>
+                                {project.name}
                             </MenuItem>
                         ))}
                     </Select>
@@ -99,8 +99,8 @@ const AssignContractor = () => {
                         value={selectedContractor || ''}
                         onChange={handleContractorChange}
                     >
-                        {users.filter(user => user.role === 'contractor').map((user, index) => (
-                            <MenuItem key={index} value={user._id}>
+                        {users.filter(user => user.role === 'contractor').map((user) => (
+                            <MenuItem key={user._id} value={user._id}>
                                 {user.email}
                             </MenuItem>
                         ))}
