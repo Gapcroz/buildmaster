@@ -1,20 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Container, Typography, TextField, Button, Select, MenuItem, FormControl, InputLabel, Snackbar, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Container, Typography, Snackbar, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { Alert } from '@mui/material';
+import UpdateWeeklyProgress from './WeeklyProgress/UpdateWeeklyProgress';
+import AddNewWeek from './WeeklyProgress/AddNewWeek';
+import UploadExcelFile from './WeeklyProgress/UploadExcelFile';
+import ProjectProgressService from '../services/projectProgressService';
 
 const ContractorWeeklyProgress = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState('');
-  const [selectedWeek, setSelectedWeek] = useState('');
-  const [realProgress, setRealProgress] = useState('');
-  const [delayReason, setDelayReason] = useState('');
-  const [newWeekStart, setNewWeekStart] = useState('');
-  const [newWeekEnd, setNewWeekEnd] = useState('');
-  const [newWeekPlannedProgress, setNewWeekPlannedProgress] = useState('');
-  const [file, setFile] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
-  const baseUrl = 'http://localhost:3001';
 
   useEffect(() => {
     fetchAssignedProjects();
@@ -22,79 +17,44 @@ const ContractorWeeklyProgress = () => {
 
   const fetchAssignedProjects = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      };
-  
-      const response = await axios.get(`${baseUrl}/api/projects/assigned`, config);
-      setProjects(response.data);
+      const fetchedProjects = await ProjectProgressService.getAssignedProjects();
+      setProjects(fetchedProjects);
     } catch (error) {
       showSnackbar('Error fetching assigned projects', 'error');
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleProjectChange = (e) => {
+    const projectId = e.target.value;
+    setSelectedProject(projectId);
+  };
+
+  const handleUpdateProgress = async (week, realProgress, delayReason) => {
     try {
-      await axios.post(`${baseUrl}/api/projects/${selectedProject}/weekly-progress`, {
-        week: selectedWeek,
-        realProgress: parseFloat(realProgress),
-        delayReason
-      });
+      await ProjectProgressService.updateWeeklyProgress(selectedProject, week, realProgress, delayReason);
       showSnackbar('Weekly progress updated successfully', 'success');
-      fetchAssignedProjects(); // Refresh the projects data
+      fetchAssignedProjects();
     } catch (error) {
       showSnackbar('Error updating weekly progress', 'error');
     }
   };
 
-  const handleAddWeek = async (e) => {
-    e.preventDefault();
+  const handleAddWeek = async (startDate, endDate, plannedProgress) => {
     try {
-      await axios.post(`${baseUrl}/api/projects/${selectedProject}/add-week`, {
-        startDate: newWeekStart,
-        endDate: newWeekEnd,
-        plannedProgress: parseFloat(newWeekPlannedProgress)
-      });
+      await ProjectProgressService.addNewWeek(selectedProject, startDate, endDate, plannedProgress);
       showSnackbar('New week added successfully', 'success');
-      fetchAssignedProjects(); // Refresh the projects data
-      setNewWeekStart('');
-      setNewWeekEnd('');
-      setNewWeekPlannedProgress('');
+      fetchAssignedProjects();
     } catch (error) {
       showSnackbar('Error adding new week', 'error');
     }
   };
 
-  const handleFileUpload = async () => {
-    if (!file || !selectedProject) {
-      showSnackbar('Please select a file and a project', 'error');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('projectId', selectedProject);
-
+  const handleFileUpload = async (file, projectId) => {
     try {
-      const response = await axios.post(`${baseUrl}/api/upload/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      if (response.status === 200) {
-        showSnackbar('File uploaded successfully', 'success');
-        fetchAssignedProjects(); // Refresh the projects data
-        setFile(null); // Reset file input
-      } else {
-        showSnackbar('Error uploading file', 'error');
-      }
+      await ProjectProgressService.uploadExcelFile(file, projectId);
+      showSnackbar('File uploaded successfully', 'success');
+      fetchAssignedProjects();
     } catch (error) {
-      console.error('Error uploading file', error);
       showSnackbar(error.response?.data?.error || 'Error uploading file', 'error');
     }
   };
@@ -108,155 +68,25 @@ const ContractorWeeklyProgress = () => {
     return project ? project.weeklyProgress : [];
   };
 
-  const handleProjectChange = (e) => {
-    const projectId = e.target.value;
-    setSelectedProject(projectId);
-    setSelectedWeek(''); // Reset selected week when project changes
-  };
-
   return (
     <Container maxWidth="md">
       <Typography variant="h4" component="h1" gutterBottom>
         Contractor Weekly Progress
       </Typography>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} style={{ padding: '20px' }}>
-            <Typography variant="h6" gutterBottom>
-              Update Weekly Progress
-            </Typography>
-            <form onSubmit={handleSubmit}>
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Project</InputLabel>
-                <Select
-                  value={selectedProject}
-                  onChange={handleProjectChange}
-                  required
-                >
-                  {projects.map((project) => (
-                    <MenuItem key={project._id} value={project._id}>{project.name}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Week</InputLabel>
-                <Select
-                  value={selectedWeek}
-                  onChange={(e) => setSelectedWeek(e.target.value)}
-                  required
-                  disabled={!selectedProject}
-                >
-                  {getSelectedProjectWeeks().map((week) => (
-                    <MenuItem key={week.week} value={week.week}>
-                      Week {week.week} ({new Date(week.startDate).toLocaleDateString()} - {new Date(week.endDate).toLocaleDateString()})
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Real Progress (%)"
-                type="number"
-                value={realProgress}
-                onChange={(e) => setRealProgress(e.target.value)}
-                required
-                inputProps={{ min: 0, max: 100 }}
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Delay Reason (if any)"
-                value={delayReason}
-                onChange={(e) => setDelayReason(e.target.value)}
-                multiline
-                rows={3}
-              />
-              <Button type="submit" variant="contained" color="primary" fullWidth>
-                Update Progress
-              </Button>
-            </form>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} style={{ padding: '20px' }}>
-            <Typography variant="h6" gutterBottom>
-              Add New Week
-            </Typography>
-            <form onSubmit={handleAddWeek}>
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Start Date"
-                type="date"
-                value={newWeekStart}
-                onChange={(e) => setNewWeekStart(e.target.value)}
-                required
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                label="End Date"
-                type="date"
-                value={newWeekEnd}
-                onChange={(e) => setNewWeekEnd(e.target.value)}
-                required
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Planned Progress (%)"
-                type="number"
-                value={newWeekPlannedProgress}
-                onChange={(e) => setNewWeekPlannedProgress(e.target.value)}
-                required
-                inputProps={{ min: 0, max: 100 }}
-              />
-              <Button type="submit" variant="contained" color="secondary" fullWidth>
-                Add Week
-              </Button>
-            </form>
-          </Paper>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper elevation={3} style={{ padding: '20px' }}>
-            <Typography variant="h6" gutterBottom>
-              Upload Excel File
-            </Typography>
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Project</InputLabel>
-              <Select
-                value={selectedProject}
-                onChange={handleProjectChange}
-                required
-              >
-                {projects.map((project) => (
-                  <MenuItem key={project._id} value={project._id}>{project.name}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <TextField
-              type="file"
-              onChange={(e) => setFile(e.target.files[0])}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              InputLabelProps={{ shrink: true }}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleFileUpload}
-              fullWidth
-              style={{ marginTop: '1rem' }}
-              disabled={!file || !selectedProject}
-            >
-              Upload Excel File
-            </Button>
-          </Paper>
-        </Grid>
+        <UpdateWeeklyProgress
+          projects={projects}
+          selectedProject={selectedProject}
+          onProjectChange={handleProjectChange}
+          onUpdateProgress={handleUpdateProgress}
+        />
+        <AddNewWeek onAddWeek={handleAddWeek} />
+        <UploadExcelFile
+          projects={projects}
+          selectedProject={selectedProject}
+          onProjectChange={handleProjectChange}
+          onFileUpload={handleFileUpload}
+        />
       </Grid>
       {selectedProject && (
         <Paper elevation={3} style={{ marginTop: '20px', padding: '20px' }}>
