@@ -3,6 +3,7 @@ import { Drawer, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography
 import { Home, Dashboard, People, UploadFile } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
+
 const drawerWidth = 240;
 
 const Sidebar = () => {
@@ -15,6 +16,8 @@ const Sidebar = () => {
         { text: 'Subir Excel', icon: <UploadFile />, path: '/upload' },
         { text: 'Contratista', icon: <UploadFile />, path: '/contractor'},
         { text: 'Asignar Contratista', icon: <UploadFile />, path: '/assign-contractor'},
+        { text: 'Progreso semanal Contratista', icon: < Dashboard/>, path: '/contractor-weekly-progress' },
+        { text: 'Progreso Auditor', icon: < Dashboard/>, path: '/audit-progress' },
     ];
 
     return (
