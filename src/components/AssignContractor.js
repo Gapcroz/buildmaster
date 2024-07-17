@@ -11,37 +11,39 @@ const AssignContractor = () => {
     const [selectedContractor, setSelectedContractor] = useState('');
 
     useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const response = await getProjects();
-                setProjects(response.data);
-            } catch (error) {
-                console.error('Error fetching projects:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Error fetching projects',
-                });
-            }
-        };
-
-        const fetchUsers = async () => {
-            try {
-                const response = await getUsers();
-                setUsers(response.data);
-            } catch (error) {
-                console.error('Error fetching users:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Error fetching users',
-                });
-            }
-        };
-
         fetchProjects();
         fetchUsers();
     }, []);
+
+    const fetchProjects = async () => {
+        try {
+            const response = await getProjects();
+            if (Array.isArray(response.data)) {
+                setProjects(response.data);
+            } else {
+                console.error('Unexpected projects data format:', response.data);
+                setProjects([]);
+            }
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+            handleError('Error fetching projects');
+        }
+    };
+
+    const fetchUsers = async () => {
+        try {
+            const response = await getUsers();
+            if (Array.isArray(response.data)) {
+                setUsers(response.data);
+            } else {
+                console.error('Unexpected users data format:', response.data);
+                setUsers([]);
+            }
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            handleError('Error fetching users');
+        }
+    };
 
     const handleProjectChange = (e) => {
         setSelectedProject(e.target.value);
@@ -53,6 +55,10 @@ const AssignContractor = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!selectedProject || !selectedContractor) {
+            handleError('Please select both a project and a contractor');
+            return;
+        }
         try {
             await assignContractor(selectedProject._id, selectedContractor);
             Swal.fire({
@@ -64,12 +70,16 @@ const AssignContractor = () => {
             setSelectedContractor('');
         } catch (error) {
             console.error('Error assigning contractor:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Error assigning contractor',
-            });
+            handleError('Error assigning contractor');
         }
+    };
+
+    const handleError = (message) => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: message,
+        });
     };
 
     return (
@@ -82,11 +92,11 @@ const AssignContractor = () => {
                     <InputLabel id="project-label">Proyecto</InputLabel>
                     <Select
                         labelId="project-label"
-                        value={selectedProject || ''}
+                        value={selectedProject}
                         onChange={handleProjectChange}
                     >
-                        {projects.map((project) => (
-                            <MenuItem key={project._id} value={project}>
+                        {projects.map((project, index) => (
+                            <MenuItem key={index} value={project._id || project.id}>
                                 {project.name}
                             </MenuItem>
                         ))}
@@ -96,11 +106,11 @@ const AssignContractor = () => {
                     <InputLabel id="contractor-label">Contratista</InputLabel>
                     <Select
                         labelId="contractor-label"
-                        value={selectedContractor || ''}
+                        value={selectedContractor}
                         onChange={handleContractorChange}
                     >
-                        {users.filter(user => user.role === 'contractor').map((user) => (
-                            <MenuItem key={user._id} value={user._id}>
+                        {users.filter(user => user.role === 'contractor').map((user, index) => (
+                            <MenuItem key={index} value={user._id || user.id}>
                                 {user.email}
                             </MenuItem>
                         ))}

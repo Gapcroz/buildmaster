@@ -12,6 +12,7 @@ const ContractorWeeklyProgress = () => {
   const [newWeekStart, setNewWeekStart] = useState('');
   const [newWeekEnd, setNewWeekEnd] = useState('');
   const [newWeekPlannedProgress, setNewWeekPlannedProgress] = useState('');
+  const [file, setFile] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   const baseUrl = 'http://localhost:3001';
 
@@ -68,6 +69,36 @@ const ContractorWeeklyProgress = () => {
     }
   };
 
+  const handleFileUpload = async () => {
+    if (!file || !selectedProject) {
+      showSnackbar('Please select a file and a project', 'error');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('projectId', selectedProject);
+
+    try {
+      const response = await axios.post(`${baseUrl}/api/upload/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.status === 200) {
+        showSnackbar('File uploaded successfully', 'success');
+        fetchAssignedProjects(); // Refresh the projects data
+        setFile(null); // Reset file input
+      } else {
+        showSnackbar('Error uploading file', 'error');
+      }
+    } catch (error) {
+      console.error('Error uploading file', error);
+      showSnackbar(error.response?.data?.error || 'Error uploading file', 'error');
+    }
+  };
+
   const showSnackbar = (message, severity) => {
     setSnackbar({ open: true, message, severity });
   };
@@ -75,6 +106,12 @@ const ContractorWeeklyProgress = () => {
   const getSelectedProjectWeeks = () => {
     const project = projects.find(p => p._id === selectedProject);
     return project ? project.weeklyProgress : [];
+  };
+
+  const handleProjectChange = (e) => {
+    const projectId = e.target.value;
+    setSelectedProject(projectId);
+    setSelectedWeek(''); // Reset selected week when project changes
   };
 
   return (
@@ -93,7 +130,7 @@ const ContractorWeeklyProgress = () => {
                 <InputLabel>Project</InputLabel>
                 <Select
                   value={selectedProject}
-                  onChange={(e) => setSelectedProject(e.target.value)}
+                  onChange={handleProjectChange}
                   required
                 >
                   {projects.map((project) => (
@@ -107,9 +144,12 @@ const ContractorWeeklyProgress = () => {
                   value={selectedWeek}
                   onChange={(e) => setSelectedWeek(e.target.value)}
                   required
+                  disabled={!selectedProject}
                 >
                   {getSelectedProjectWeeks().map((week) => (
-                    <MenuItem key={week.week} value={week.week}>Week {week.week}</MenuItem>
+                    <MenuItem key={week.week} value={week.week}>
+                      Week {week.week} ({new Date(week.startDate).toLocaleDateString()} - {new Date(week.endDate).toLocaleDateString()})
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -178,6 +218,43 @@ const ContractorWeeklyProgress = () => {
                 Add Week
               </Button>
             </form>
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper elevation={3} style={{ padding: '20px' }}>
+            <Typography variant="h6" gutterBottom>
+              Upload Excel File
+            </Typography>
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Project</InputLabel>
+              <Select
+                value={selectedProject}
+                onChange={handleProjectChange}
+                required
+              >
+                {projects.map((project) => (
+                  <MenuItem key={project._id} value={project._id}>{project.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              type="file"
+              onChange={(e) => setFile(e.target.files[0])}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              InputLabelProps={{ shrink: true }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleFileUpload}
+              fullWidth
+              style={{ marginTop: '1rem' }}
+              disabled={!file || !selectedProject}
+            >
+              Upload Excel File
+            </Button>
           </Paper>
         </Grid>
       </Grid>

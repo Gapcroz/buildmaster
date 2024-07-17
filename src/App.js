@@ -5,10 +5,10 @@ import Register from './components/Register';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
+import AuditProgress from './pages/AuditProgress';
 import UploadExcel from './components/UploadExcel';
 import AppBarComponent from './components/AppBar';
 import Sidebar from './components/Sidebar';
-import ContractorScreen from './components/ContractorScreen';
 import ContractorWeeklyProgress from "./components/ContractorWeeklyProgress";
 import AssignContractor from './components/AssignContractor';
 import { Box, CssBaseline } from '@mui/material';
@@ -36,7 +36,7 @@ const App = () => {
                                 <Route path="/dashboard" element={<Dashboard />} />
                                 <Route path="/users" element={<Users />} />
                                 <Route path="/upload" element={<UploadExcel />} />
-                                <Route path="/contractor" element={<ContractorScreen />} />
+                                
                                 <Route path="/contractor-weekly-progress" element={<ContractorWeeklyProgress />} />
                                 <Route path="/assign-contractor" element={<AssignContractor />} />
                                 <Route path="/audit-progress" element={<AuditProgress />} />
