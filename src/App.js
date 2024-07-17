@@ -14,7 +14,8 @@ import AssignContractor from './components/AssignContractor';
 import { Box, CssBaseline } from '@mui/material';
 
 const App = () => {
-    const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
+
 
     return (
         <Router>
@@ -38,6 +39,7 @@ const App = () => {
                                 <Route path="/contractor" element={<ContractorScreen />} />
                                 <Route path="/contractor-weekly-progress" element={<ContractorWeeklyProgress />} />
                                 <Route path="/assign-contractor" element={<AssignContractor />} />
+                                <Route path="/audit-progress" element={<AuditProgress />} />
                             </>
                         ) : (
                             <Route path="*" element={<Navigate to="/login" />} />

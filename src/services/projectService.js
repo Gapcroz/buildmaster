@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001/api/avances';
+const API_URL = 'http://localhost:3001/api/projects';
 
 export const getProjects = () => {
-    return axios.get(`${API_URL}/getprojects`);
+    return axios.get(`${API_URL}/projects`);
 };
 
 export const assignContractor = (projectId, contractorId) => {
