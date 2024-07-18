@@ -1,11 +1,22 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = 'http://localhost:3001/api/projects';
+const API_URL = "http://localhost:3001/api/projects";
 
 export const getProjects = () => {
-    return axios.get(`${API_URL}/projects`);
+  return axios.get(`${API_URL}/projects`);
 };
 
 export const assignContractor = (projectId, contractorId) => {
-    return axios.post(`${API_URL}/assign-contractor`, { projectId, contractorId });
+  return axios.post(`${API_URL}/assign-contractor`, {
+    projectId,
+    contractorId,
+  });
+};
+
+export const getExcelData = async (projectId) => {
+  return axios.get(`${API_URL}/excel-data/${projectId}`);
+};
+
+export const getPieChartData = async (projectId) => {
+  return axios.get(`${API_URL}/pie-chart-data/${projectId}`);
 };
