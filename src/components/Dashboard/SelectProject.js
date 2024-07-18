@@ -9,7 +9,6 @@ import {
   Paper,
 } from "@mui/material";
 import { getProjects, getPieChartData } from "../../services/projectService";
-import DateTimePickerValue from "./DateTimePicker";
 import ExcelTable from "./ExcelTable";
 import PieChartComponent from "./PieChart";
 import { styled } from "@mui/system";
@@ -82,11 +81,6 @@ export default function ProjectSelect() {
       </StyledSelect>
       {selectedProject && (
         <Grid container spacing={4} justifyContent="center">
-          <Grid item xs={2} md={8}>
-            <StyledPaper>
-              <DateTimePickerValue project={selectedProject} />
-            </StyledPaper>
-          </Grid>
           <Grid item xs={7}>
             <StyledPaper>
               <PieChartComponent data={pieChartData} />
