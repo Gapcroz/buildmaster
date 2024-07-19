@@ -1,22 +1,17 @@
-import React from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Home from "./pages/Home";
-import Dashboard from "./pages/Dashboard";
-import Users from "./pages/Users";
-import UploadExcel from "./components/UploadExcel";
-import AppBarComponent from "./components/AppBar";
-import Sidebar from "./components/Sidebar";
-import ContractorScreen from "./components/ContractorScreen";
-import AssignContractor from "./components/AssignContractor";
-import { Box, CssBaseline } from "@mui/material";
-
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import Register from './components/Register';
+import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
+import Users from './pages/Users';
+import AuditProgress from './pages/AuditProgress';
+import UploadExcel from './components/UploadExcel';
+import AppBarComponent from './components/AppBar';
+import Sidebar from './components/Sidebar';
+import ContractorWeeklyProgress from "./components/ContractorWeeklyProgress";
+import AssignContractor from './components/AssignContractor';
+import { Box, CssBaseline } from '@mui/material';
 
 const App = () => {
   const token = localStorage.getItem("token");
@@ -41,7 +36,8 @@ const App = () => {
                                 <Route path="/dashboard" element={<Dashboard />} />
                                 <Route path="/users" element={<Users />} />
                                 <Route path="/upload" element={<UploadExcel />} />
-                                <Route path="/contractor" element={<ContractorScreen />} />
+                                
+                                <Route path="/contractor-weekly-progress" element={<ContractorWeeklyProgress />} />
                                 <Route path="/assign-contractor" element={<AssignContractor />} />
                                 <Route path="/audit-progress" element={<AuditProgress />} />
                             </>
