@@ -12,11 +12,9 @@ export const assignContractor = (projectId, contractorId) => {
     contractorId,
   });
 };
-
-export const getExcelData = async (projectId) => {
-  return axios.get(`${API_URL}/excel-data/${projectId}`);
-};
-
+export const getProjectData = async (projectId) => {
+  return axios.get(`${API_URL}/${projectId}`);
+}
 export const getPieChartData = async (projectId) => {
   return axios.get(`${API_URL}/pie-chart-data/${projectId}`);
 };

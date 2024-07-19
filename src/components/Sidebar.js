@@ -13,8 +13,6 @@ const Sidebar = () => {
         { text: 'Home', icon: <Home />, path: '/' },
         { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
         { text: 'Usuarios', icon: <People />, path: '/users' },
-        { text: 'Subir Excel', icon: <UploadFile />, path: '/upload' },
-        
         { text: 'Asignar Contratista', icon: <UploadFile />, path: '/assign-contractor'},
         { text: 'Progreso semanal Contratista', icon: < Dashboard/>, path: '/contractor-weekly-progress' },
         { text: 'Progreso Auditor', icon: < Dashboard/>, path: '/audit-progress' },
