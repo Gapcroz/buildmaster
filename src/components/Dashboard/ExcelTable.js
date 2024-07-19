@@ -1,4 +1,3 @@
-// excelTable.js
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -12,37 +11,36 @@ import {
 import { getProjectData } from "../../services/projectService";
 
 const ExcelTable = ({ projectId }) => {
-  const [excelData, setExcelData] = useState(null);
+  const [projectData, setProjectData] = useState(null);
 
-  //TODO, receive from elsewhere in the frontend instead of doing an API call (too late for that now ig)
   useEffect(() => {
-    async function fetchExcelData() {
+    async function fetchProjectData() {
       try {
         console.log("Fetching data for project ID:", projectId);
         const response = await getProjectData(projectId);
         console.log("Data fetched:", response.data);
-        setExcelData(response.data);
+        setProjectData(response.data);
       } catch (error) {
-        console.error("Error fetching Excel data:", error);
+        console.error("Error fetching project data:", error);
       }
     }
 
     if (projectId) {
-      fetchExcelData();
+      fetchProjectData();
     }
   }, [projectId]);
 
-  if (!excelData) {
+  if (!projectData) {
     return <Typography>Cargando datos...</Typography>;
   }
 
   return (
     <Container>
       <Typography variant="h6" gutterBottom>
-        Datos del Proyecto: {excelData.name}
+        Datos del Proyecto: {projectData.name}
       </Typography>
       <Typography variant="h6" gutterBottom>
-        Semanas:
+        Progreso Semanal:
       </Typography>
       <Table>
         <TableHead>
@@ -53,17 +51,19 @@ const ExcelTable = ({ projectId }) => {
             <TableCell>Progreso Planeado</TableCell>
             <TableCell>Progreso Real</TableCell>
             <TableCell>Razón del Retraso</TableCell>
+            <TableCell>Última Actualización</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {excelData.weeks.map((week, index) => (
+          {projectData.weeklyProgress.map((week, index) => (
             <TableRow key={index}>
               <TableCell>{week.week}</TableCell>
-              <TableCell>{week.startDate}</TableCell>
-              <TableCell>{week.endDate}</TableCell>
+              <TableCell>{new Date(week.startDate).toLocaleDateString()}</TableCell>
+              <TableCell>{new Date(week.endDate).toLocaleDateString()}</TableCell>
               <TableCell>{week.plannedProgress}</TableCell>
               <TableCell>{week.realProgress}</TableCell>
               <TableCell>{week.delayReason}</TableCell>
+              <TableCell>{new Date(week.lastUpdated).toLocaleString()}</TableCell>
             </TableRow>
           ))}
         </TableBody>
