@@ -9,16 +9,17 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { getExcelData } from "../../services/projectService";
+import { getProjectData } from "../../services/projectService";
 
 const ExcelTable = ({ projectId }) => {
   const [excelData, setExcelData] = useState(null);
 
+  //TODO, receive from elsewhere in the frontend instead of doing an API call (too late for that now ig)
   useEffect(() => {
     async function fetchExcelData() {
       try {
         console.log("Fetching data for project ID:", projectId);
-        const response = await getExcelData(projectId);
+        const response = await getProjectData(projectId);
         console.log("Data fetched:", response.data);
         setExcelData(response.data);
       } catch (error) {

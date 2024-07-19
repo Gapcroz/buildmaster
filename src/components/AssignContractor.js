@@ -60,7 +60,7 @@ const AssignContractor = () => {
             return;
         }
         try {
-            await assignContractor(selectedProject._id, selectedContractor);
+            await assignContractor(selectedProject, selectedContractor);
             Swal.fire({
                 icon: 'success',
                 title: 'Éxito',
