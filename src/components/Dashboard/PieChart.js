@@ -2,7 +2,14 @@
 import React from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 
-const COLORS = ["#124654", "#00a08F", "#dbc251", "#ffb134", "#ed5761"];
+const COLORS = [
+  "#ed5761",
+  "#124654",
+  "#dbc251",
+  "#00a08F",
+  "#ffb134",
+  "#d3bca0",
+];
 
 const PieChartComponent = ({ data }) => {
   const pieData = data.map((item) => ({

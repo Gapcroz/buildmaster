@@ -19,14 +19,18 @@ const UpdateUser = () => {
   const [role, setRole] = useState("");
   const [userFound, setUserFound] = useState(false);
 
+  const showAlert = (icon, title, text) => {
+    Swal.fire({
+      icon,
+      title,
+      text,
+    });
+  };
+
   const searchUser = async (e) => {
     e.preventDefault();
     if (!id) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Llenar campo obligatorio",
-      });
+      showAlert("error", "Error", "Llenar campo obligatorio");
       return;
     }
     try {
@@ -36,44 +40,45 @@ const UpdateUser = () => {
         setPassword(user.data.password);
         setRole(user.data.role);
         setUserFound(true);
-        Swal.fire({
-          icon: "success",
-          title: "Éxito",
-          text: "Usuario encontrado exitosamente",
-        });
+        showAlert("success", "Éxito", "Usuario encontrado exitosamente");
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Usuario no encontrado",
-        });
+        showAlert("error", "Error", "Usuario no encontrado");
       }
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo encontrar el usuario. Por favor, inténtelo de nuevo.",
-      });
+      showAlert(
+        "error",
+        "Error",
+        "No se pudo encontrar el usuario. Por favor, inténtelo de nuevo."
+      );
       console.error("Error searching user:", error);
     }
   };
 
   const updateSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await updateUser(id, email, password, role);
-      Swal.fire({
-        icon: "success",
-        title: "Éxito",
-        text: "Usuario actualizado exitosamente",
-      });
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo actualizar el usuario. Por favor, inténtelo de nuevo.",
-      });
-      console.error("Error actualizando usuario:", error);
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Podrás cambiarlos de nuevo",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, actualizar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await updateUser(id, email, password, role);
+        showAlert("success", "Éxito", "Usuario actualizado exitosamente");
+      } catch (error) {
+        showAlert(
+          "error",
+          "Error",
+          "No se pudo actualizar el usuario. Por favor, inténtelo de nuevo."
+        );
+        console.error("Error actualizando usuario:", error);
+      }
     }
   };
 

@@ -8,21 +8,34 @@ const DeleteUser = () => {
 
   const deleteSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await deleteUser(id);
-      Swal.fire({
-        icon: "success",
-        title: "Éxito",
-        text: "Usuario eliminado exitosamente",
-      });
-      setId("");
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo eliminar el usuario. Por favor, inténtelo de nuevo.",
-      });
-      console.error("Error deleting user:", error);
+
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "No podrás revertir esta acción",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    });
+    if (result.isConfirmed) {
+      try {
+        await deleteUser(id);
+        Swal.fire({
+          icon: "success",
+          title: "Éxito",
+          text: "Usuario eliminado exitosamente",
+        });
+        setId("");
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudo eliminar el usuario. Por favor, inténtelo de nuevo.",
+        });
+        console.error("Error deleting user:", error);
+      }
     }
   };
 
